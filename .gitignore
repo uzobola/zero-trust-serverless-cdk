@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+*.env
+.env/
+.venv/
+.Python
+
+# AWS CDK
+cdk.out/
+
+# Lambda build artifacts (if any)
+*.zip
+
+# IDEs
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# AWS credentials or config (NEVER commit these)
+*.pem
+.aws/
+
+# Misc
+.envrc
+
+
+
+
+
+
+

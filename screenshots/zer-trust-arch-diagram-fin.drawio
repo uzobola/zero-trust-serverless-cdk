@@ -1,0 +1,73 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36" version="27.1.4">
+  <diagram name="Zero Trust Serverless Notes API" id="QZkTDsY5sMd8FQUkDp80">
+    <mxGraphModel dx="1042" dy="561" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-20" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="300" y="100" width="310" height="480" as="geometry" />
+        </mxCell>
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-1" value="&lt;div&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;User&lt;br&gt;(JWT Token)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="53DNEDhjEtq-J9fsM1gJ-20">
+          <mxGeometry x="190" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-2" value="&lt;div&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;Amazon API Gateway&lt;br&gt;(HTTP API v2)&lt;/font&gt;" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;whiteSpace=wrap;html=1;fontColor=#333333;" vertex="1" parent="53DNEDhjEtq-J9fsM1gJ-20">
+          <mxGeometry x="189" y="110" width="120" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-3" style="endArrow=block;html=1;" edge="1" parent="53DNEDhjEtq-J9fsM1gJ-20" source="53DNEDhjEtq-J9fsM1gJ-1" target="53DNEDhjEtq-J9fsM1gJ-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-5" style="endArrow=block;html=1;" edge="1" parent="53DNEDhjEtq-J9fsM1gJ-20" source="53DNEDhjEtq-J9fsM1gJ-2" target="53DNEDhjEtq-J9fsM1gJ-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-9" style="endArrow=block;dashed=1;html=1;" edge="1" parent="53DNEDhjEtq-J9fsM1gJ-20" source="53DNEDhjEtq-J9fsM1gJ-8" target="53DNEDhjEtq-J9fsM1gJ-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-11" value="" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#8C4FFF;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.api_gateway;" vertex="1" parent="53DNEDhjEtq-J9fsM1gJ-20">
+          <mxGeometry x="221" y="110" width="58" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-14" value="" style="points=[[0.35,0,0],[0.98,0.51,0],[1,0.71,0],[0.67,1,0],[0,0.795,0],[0,0.65,0]];verticalLabelPosition=bottom;sketch=0;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco19.user;fillColor=#005073;strokeColor=none;" vertex="1" parent="53DNEDhjEtq-J9fsM1gJ-20">
+          <mxGeometry x="235" y="10" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-15" value="" style="endArrow=block;html=1;" edge="1" parent="53DNEDhjEtq-J9fsM1gJ-20" source="53DNEDhjEtq-J9fsM1gJ-4" target="53DNEDhjEtq-J9fsM1gJ-13">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="267" y="240" as="sourcePoint" />
+            <mxPoint x="255" y="378" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-16" value="" style="group" vertex="1" connectable="0" parent="53DNEDhjEtq-J9fsM1gJ-20">
+          <mxGeometry x="189" y="240" width="120" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-4" value="&lt;div&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;AWS Lambda&lt;br&gt;(handler.py)&lt;/font&gt;" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;whiteSpace=wrap;html=1;fontColor=#333333;" vertex="1" parent="53DNEDhjEtq-J9fsM1gJ-16">
+          <mxGeometry width="120" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-12" value="" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="53DNEDhjEtq-J9fsM1gJ-16">
+          <mxGeometry x="30" width="58" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-17" value="" style="group" vertex="1" connectable="0" parent="53DNEDhjEtq-J9fsM1gJ-20">
+          <mxGeometry x="190" y="378" width="120" height="102" as="geometry" />
+        </mxCell>
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-6" value="&lt;div&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Amazon DynamoDB&lt;/span&gt;&lt;/div&gt;(NotesTable)&lt;/font&gt;" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;whiteSpace=wrap;html=1;fontColor=#333333;" vertex="1" parent="53DNEDhjEtq-J9fsM1gJ-17">
+          <mxGeometry width="120" height="102" as="geometry" />
+        </mxCell>
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-7" style="endArrow=block;html=1;" edge="1" parent="53DNEDhjEtq-J9fsM1gJ-17" source="53DNEDhjEtq-J9fsM1gJ-13" target="53DNEDhjEtq-J9fsM1gJ-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-13" value="" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#C925D1;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.dynamodb;" vertex="1" parent="53DNEDhjEtq-J9fsM1gJ-17">
+          <mxGeometry x="30" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-18" value="" style="group" vertex="1" connectable="0" parent="53DNEDhjEtq-J9fsM1gJ-20">
+          <mxGeometry y="105" width="120" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-8" value="&lt;div&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;Amazon Cognito&lt;br&gt;(User Pool Authorizer)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#666666;fillColor=#f5f5f5;fontColor=#333333;" vertex="1" parent="53DNEDhjEtq-J9fsM1gJ-18">
+          <mxGeometry width="120" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-10" value="" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#DD344C;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cognito;" vertex="1" parent="53DNEDhjEtq-J9fsM1gJ-18">
+          <mxGeometry x="27.75" width="64.5" height="64.5" as="geometry" />
+        </mxCell>
+        <mxCell id="53DNEDhjEtq-J9fsM1gJ-22" value="&lt;div style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; line-height: 19px; white-space-collapse: preserve;&quot;&gt;&lt;span style=&quot;font-weight: bold; background-color: rgb(230, 230, 230);&quot;&gt;&lt;font style=&quot;color: rgb(0, 0, 0); font-size: 16px;&quot;&gt;Zero-Trust Serverless Notes API (CDK + Cognito + Lambda + DynamoDB)&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="214" y="53" width="607" height="33" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
