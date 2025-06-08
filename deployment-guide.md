@@ -14,9 +14,8 @@
 ---
 
 ## 📁 Project Structure
-zero-trust-serverless-cdk/
-![Project Structure](screenshots/project-structure.png)
 
+![Project Structure](screenshots/project-structure.png)
 
 <br><br>
 
