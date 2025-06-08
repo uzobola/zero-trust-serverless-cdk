@@ -9,26 +9,16 @@
 - AWS Lambda Function (PutNote)
 - API Gateway (secured with JWT Authorizer)
 
+<br><br>
 
 ---
 
 ## 📁 Project Structure
 zero-trust-serverless-cdk/
-│
-├── lambda/
-│   └── handler.py                # Lambda function for creating notes
-│
-├── cdk/
-│   ├── app.py                   # CDK app entrypoint
-│   ├── auth_stack.py            # Cognito UserPool + Client
-│   ├── data_stack.py            # DynamoDB table
-│   └── api_stack.py             # Lambda + API Gateway + Authorizer
-│
-│── deployment-guide.md
-├── README.md
-└── requirements.txt             # CDK and boto3 dependencies
+![Project Structure](screenshots/project-structure.png)
 
 
+<br><br>
 
 ---
 
@@ -37,6 +27,8 @@ zero-trust-serverless-cdk/
 - Python 3.8+
 - AWS CLI configured (`aws configure`)
 - AWS CDK installed (`npm install -g aws-cdk`)
+
+<br><br>
 
 ---
 
@@ -76,9 +68,12 @@ Outputs:
 Save them — you will need these for Postman or CLI testing.
 
 Example Outputs: 
-  AuthStack.UserPoolId = us-east-1_XXXXXXX
-  AuthStack.UserPoolClientId = abc123xyz...
-  ApiStack.HttpApiUrl = https://abc123.execute-api.us-east-1.amazonaws.com
+ - AuthStack.UserPoolId = us-east-1_XXXXXXX
+ - AuthStack.UserPoolClientId = abc123xyz...
+ - ApiStack.HttpApiUrl = https://abc123.execute-api.us-east-1.amazonaws.com
+
+
+<br><br>
 
 ---
 
@@ -108,9 +103,8 @@ Note down the following details:
 
 Keep them handy.
 
---- 
 
-## 🧪 Authenticate via CLI
+## 🧪 Authenticate using the CLI
 
 3. Authenticate using AWS CLI: (Note: If you dont have AWS CLI installed, follow the instructions at https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 
@@ -145,8 +139,7 @@ aws cognito-idp respond-to-auth-challenge \
   -H "Authorization: Bearer <IdToken>" \
   -H "Content-Type: application/json" \
   -d '{"noteId": "1", "userId": "user@example.com", "content": "Hello from CLI"}'
-
-
+```
 
 b. For PowerShell (Windows)
 (Note: Replace <AccessToken> with the actual token you received from the authentication step,
@@ -160,8 +153,9 @@ Invoke-RestMethod `
     "Content-Type" = "application/json"
   } `
   -Body '{"noteId": "1", "userId": "user@example.com", "content": "Hello from PowerShell"}'
+```
 
-
+<br><br>
 ---
 
 
@@ -172,32 +166,35 @@ Postman Setup for Authenticated Call
 Method: POST 
 
 3. Add Headers
-Go to the Headers tab.
+- Go to the Headers tab.
+```
+  Add:
+      Key: Authorization:  Bearer < Your IdToken>
+      Value: Bearer <paste-your-IdToken-here>
 
-Add:
-    Key: Authorization:  Bearer < Your IdToken>
-    Value: Bearer <paste-your-IdToken-here>
+      Key: Content-Type
+      Value: application/json
+```
 
-    Key: Content-Type
-    Value: application/json
+- Add Body (for POST requests)
+  Go to the Body tab:
+      Select raw
+      Select JSON
+  Example payload:
+```
+  {
+    "noteId": "1",
+    "userId": "your-email-address.com",
+    "content": "This is a secure note from Postman"
+  }
+```
 
-
-Add Body (for POST requests)
-Go to the Body tab:
-Select raw
-Select JSON
-Example payload:
-
-{
-  "noteId": "1",
-  "userId": "your-email-address.com",
-  "content": "This is a secure note from Postman"
-}
-
-
-Hit Send
+- Hit Send
 You should get a 200 OK and a response!
 ![JWT Auth POST](screenshots/successful-jwt-post.png)
+
+<br><br>
+
 ---
 
 ## ✅ Verify Note is in DynamoDB Table
@@ -224,7 +221,9 @@ Authenticated with Cognito using JWT
 
 
 
-==========================================================================================================
+===============================================================================
+
+<br><br>
 
 ## ✅  Cleanup
 cdk destroy --all
