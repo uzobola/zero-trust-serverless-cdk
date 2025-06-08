@@ -109,25 +109,35 @@ Keep them handy.
 3. Authenticate using AWS CLI: (Note: If you dont have AWS CLI installed, follow the instructions at https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 
 a. Initiate Auth
-    aws cognito-idp initiate-auth \
+```
+aws cognito-idp initiate-auth \
   --auth-flow USER_PASSWORD_AUTH \
   --client-id <UserPoolClientId> \
   --auth-parameters USERNAME=<email>,PASSWORD=<password>
+  ```
 
 b. Respond to Challenge (NEW_PASSWORD_REQUIRED)
+
+```
 aws cognito-idp respond-to-auth-challenge \
   --client-id <client-id> \
   --challenge-name NEW_PASSWORD_REQUIRED \
   --challenge-responses USERNAME=<email>,NEW_PASSWORD=<NewSecure456!>,PASSWORD=<Temp1234!> \
   --session <session-string>
 
+```
+
   (Note: If it works will get this response): 
+```
   "AuthenticationResult": {
   "AccessToken": "....",
   "IdToken": "....",
   "RefreshToken": "...."
 }
 )
+```
+
+<br><br>
 
 ## 🔁 Test API with JWT
 
