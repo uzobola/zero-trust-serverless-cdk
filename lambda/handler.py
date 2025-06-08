@@ -1,10 +1,3 @@
-# def lambda_handler(event, context):
-#     return {
-#         "statusCode": 200,
-#         "body": "Hello from Lambda!"
-#     }
-# # This is a simple Lambda function handler that returns a 200 status code with a message.
-# # It can be used as a placeholder for more complex logic in a serverless application.
 
 
 import json
