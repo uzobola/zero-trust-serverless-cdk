@@ -1,15 +1,15 @@
-# 🚀 Zero-Trust Serverless Notes API (CDK + Cognito + Lambda + DynamoDB)
+#  Zero-Trust Serverless Notes API (CDK + Cognito + Lambda + DynamoDB)
 A secure, fully serverless Notes API built using AWS CDK (Python), Cognito, Lambda, API Gateway, and DynamoDB. Designed using Zero Trust principles and least-privilege access to showcase modern authentication and infrastructure-as-code (IaC) patterns.
 
 --- 
 
 ## 📌 Project Features
-- 🔐 **Zero Trust Authentication** using Amazon Cognito and JWT validation
-- ☁️ **Serverless** architecture with AWS Lambda and API Gateway (HTTP API v2)
-- 🛡 **Fine-Grained IAM**: Lambda has scoped access (PutItem only)
-- 💾 **DynamoDB**: Notes stored by composite key (`userId` + `noteId`)
-- 🧱 **Modular CDK Stacks**: `AuthStack`, `DataStack`, and `ApiStack
-- 🧪 **Tested** via `curl`, PowerShell, and Postman (JWT Auth flows)
+-  **Zero Trust Authentication** using Amazon Cognito and JWT validation
+-  **Serverless** architecture with AWS Lambda and API Gateway (HTTP API v2)
+-  **Fine-Grained IAM**: Lambda has scoped access (PutItem only)
+-  **DynamoDB**: Notes stored by composite key (`userId` + `noteId`)
+-  **Modular CDK Stacks**: `AuthStack`, `DataStack`, and `ApiStack
+-  **Tested** via `curl`, PowerShell, and Postman (JWT Auth flows)
 
 ---
 
@@ -98,15 +98,6 @@ POST request with a valid JWT confirms end-to-end authentication flow.
 
 
 
-## ** License **
-![Author](screenshots/logo-transparent.png)
-## 👤 Author
-**Uzo B.**
-
-## 📄 License
-This project is licensed under the MIT License.
-
-
 ## 📚 Deployment & Testing
 Please see the [Deployment Guide](./deployment-guide.md) for instructions on:
 
@@ -114,3 +105,15 @@ Please see the [Deployment Guide](./deployment-guide.md) for instructions on:
 - Cognito User Creation
 - CLI & Postman JWT Testing
 - Cleanup with `cdk destroy`
+
+
+
+
+## ** License **
+## 👤 Author
+**Uzo B.**
+
+## 📄 License
+This project is licensed under the MIT License.
+
+![Author](screenshots/logo-transparent.png)

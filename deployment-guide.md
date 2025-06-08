@@ -1,4 +1,4 @@
-# 🚀 Deployment Guide: Zero Trust Serverless Notes API
+# Deployment Guide: Zero Trust Serverless Notes API
 
 ---
 
@@ -32,7 +32,7 @@ zero-trust-serverless-cdk/
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 ### Prerequisites
 - Python 3.8+
 - AWS CLI configured (`aws configure`)
@@ -43,7 +43,6 @@ zero-trust-serverless-cdk/
 ## Deployment Instructions
 
 ### Clone + Install CDK
-```bash
 git clone https://github.com/YOUR_USERNAME/secure-notes-api-cdk.git
 cd secure-notes-api-cdk
 
@@ -87,11 +86,12 @@ Example Outputs:
 
 You can use the AWS Console or a script to create users. I will include both.
 
-Option 1: Script (Optional)
-<link to script for bash>
-<link to script for windows>
+**Option 1: Script (Optional)**  
+- [Bash Script (Linux/macOS)](./create-cognito-user-bash.sh)  
+- [PowerShell Script (Windows)](./create-cognito-user-windows.ps1)
 
-Option 2 : Create Test User (Console)
+
+**Option 2 : Create Test User (Console)**
 1. Create a user via the AWS Console (Cognito > Users > Create User)
     a.Use temporary password and verify email
     b. Check "Mark email as verified"
@@ -166,7 +166,7 @@ Invoke-RestMethod `
 
 
 ## ✅ Use Postman to Test Your Secured API
-🚀 Postman Setup for Authenticated Call
+Postman Setup for Authenticated Call
 1. Open Postman
 2. Create a new request
 Method: POST 
@@ -197,7 +197,7 @@ Example payload:
 
 Hit Send
 You should get a 200 OK and a response!
-
+![JWT Auth POST](screenshots/successful-jwt-post.png)
 ---
 
 ## ✅ Verify Note is in DynamoDB Table
@@ -209,10 +209,11 @@ You should get a 200 OK and a response!
 	Hit the Run button to execute the scan.
 
 ✅ Expected Result
+Scan result confirms a secure note was successfully stored.
+![DynamoDB Scan Success](screenshots/dynamodb-scan-success.png)
 
-Screenshot
 
-Summary
+**Summary**
 Status: ✅ Zero Trust API Working!
 With a successful response in Postman, you have..
 
@@ -225,5 +226,5 @@ Authenticated with Cognito using JWT
 
 ==========================================================================================================
 
-## 🧼 Cleanup
+## ✅  Cleanup
 cdk destroy --all
