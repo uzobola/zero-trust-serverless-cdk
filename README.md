@@ -37,6 +37,11 @@ This project uses a zero-trust, serverless design with token-based authenticatio
 | `ApiStack`  | Deploys **Lambda**, **API Gateway**, and integrates **JWT Auth** |
 
 
+<br><br>
+
+
+--- 
+
 ## 🔐 Security Design
 This project adopts a Zero-Trust security model with token-based access control, scoped permissions, and infrastructure as code.
 
@@ -46,6 +51,7 @@ This project adopts a Zero-Trust security model with token-based access control,
 - ✅ **API Gateway Protected with JWT Authorizer** – Verifies the `Authorization` header on every request.
 - ✅ **Deployed with CDK Best Practices** – Secure-by-default infrastructure defined in code for repeatability and auditability.
 
+<br><br>
 
 ---
 
@@ -55,41 +61,61 @@ This project adopts a Zero-Trust security model with token-based access control,
 Environment bootstrapped to allow CDK deployment using AWS execution roles.
 ![CDK Bootstrap](screenshots/cdk-bootstrap.jpeg)
 
+<br><br>
+
 ### CDK Deployment – Auth Stack
 Provisioned Cognito User Pool and App Client for zero-trust JWT authentication.
 ![Auth Stack Deployed](screenshots/auth-stack-deployed.png)
+
+<br><br>
 
 ### CDK Deployment – Data Stack
 DynamoDB table created with userId and noteId as composite keys.
 ![Data Stack Deployed](screenshots/data-stack-deployed.png)
 
+<br><br>
+
 ### CDK Deployment – API Stack
 API Gateway HTTP API set up with Lambda integration secured by Cognito JWT authorizer.
 ![API Stack Deployed](screenshots/api-stack-deployed.png)
+
+<br><br>
 
 ### DynamoDB Table Scan (Before Note Created)
 Initial scan of the notes table confirms successful deployment.
 ![DynamoDB Scan Empty](screenshots/dynamodb-scan-empty.png)
 
+<br><br>
+
 ### DynamoDB Table Scan (After Note Created)
 Scan result confirms a secure note was successfully stored.
 ![DynamoDB Scan Success](screenshots/dynamodb-scan-success.png)
+
+<br><br>
 
 ### Cognito User View
 Verified Cognito user ready to retrieve a JWT and invoke protected APIs.
 ![Cognito User](screenshots/cognito-user-view.png)
 
+<br><br>
+
 ### API Gateway Overview
 HTTP API deployed with default stage and accessible invoke URL.
 ![API Gateway](screenshots/api-gateway.png)
+
+<br><br>
 
 ### JWT Authorizer Configuration
 Authorizer enforces strict token validation for all routes.
 ![JWT Authorizer Route](screenshots/jwt-authorizer-attached.png)
 
+<br><br>
+
 ### Lambda Integration with $default Route
 The $default route connects directly to a Lambda function for note handling.
 ![Lambda Integration](screenshots/lambda-integration.png)
+
+<br><br>
 
 ### ✅ Secure Note Creation via JWT (CLI)
 POST request with a valid JWT confirms end-to-end authentication flow.
@@ -97,6 +123,7 @@ POST request with a valid JWT confirms end-to-end authentication flow.
 
 
 
+<br><br>
 
 ## 📚 Deployment & Testing
 Please see the [Deployment Guide](./deployment-guide.md) for instructions on:
@@ -107,13 +134,13 @@ Please see the [Deployment Guide](./deployment-guide.md) for instructions on:
 - Cleanup with `cdk destroy`
 
 
+<br><br>
 
-
-## ** License **
-## 👤 Author
+## License
+### Author
 **Uzo B.**
 
-## 📄 License
+## License
 This project is licensed under the MIT License.
 
 ![Author](screenshots/logo-transparent.png)
