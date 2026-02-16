@@ -1,55 +1,3 @@
-# from aws_cdk import (
-#     Stack,
-#     CfnOutput,
-#     aws_lambda as _lambda,
-#     aws_apigatewayv2 as apigw,
-#     aws_apigatewayv2_integrations as integrations,
-#     aws_apigatewayv2_authorizers as authorizers,
-#     aws_iam as iam
-# )
-# from constructs import Construct
-
-# class ApiStack(Stack):
-#     def __init__(self, scope: Construct, id: str, *, user_pool, user_pool_client, notes_table, **kwargs):
-#         super().__init__(scope, id, **kwargs)  # Add this line!
-
-#         # Lambda function
-#         note_lambda = _lambda.Function(
-#             self, "CreateNoteFunction",
-#             runtime=_lambda.Runtime.PYTHON_3_12,
-#             handler="handler.lambda_handler",
-#             code=_lambda.Code.from_asset("../lambda"),
-#             environment={
-#                 "TABLE_NAME": notes_table.table_name
-#             }
-#         )
-
-#         # Least-privilege: allow only PutItem
-#         notes_table.grant_write_data(note_lambda)
-
-#         # Cognito authorizer
-#         # Note: user_pool_client is now passed as a parameter to the ApiStack
-#         # This is necessary to ensure the authorizer can validate tokens
-#         cognito_auth = authorizers.HttpUserPoolAuthorizer(
-#             "UserPoolAuthorizer",
-#             user_pool,  # positional parameter
-            
-# )
-
-#         # HTTP API Gateway
-#         api = apigw.HttpApi(
-#             self, "NotesApi",
-#             default_authorizer=cognito_auth,
-#             default_integration=integrations.HttpLambdaIntegration(
-#                 "LambdaIntegration", note_lambda
-        #     )
-        # )
-
-        # # self.api_url = api.api_endpoint
-        
-        # CfnOutput(self, "HttpApiUrl", value=api.api_endpoint)
-
-
 from aws_cdk import (
     Stack,
     CfnOutput,
@@ -57,42 +5,66 @@ from aws_cdk import (
     aws_apigatewayv2 as apigw,
     aws_apigatewayv2_integrations as integrations,
     aws_apigatewayv2_authorizers as authorizers,
-    aws_iam as iam
 )
 from constructs import Construct
 
-class ApiStack(Stack):
-    def __init__(self, scope: Construct, id: str, *, user_pool, user_pool_client, notes_table, **kwargs):
-        super().__init__(scope, id, **kwargs)
 
-        # Lambda function
+class ApiStack(Stack):
+    def __init__(
+        self,
+        scope: Construct,
+        construct_id: str,
+        *,
+        user_pool,
+        user_pool_client,
+        notes_table,
+        **kwargs,
+    ):
+        super().__init__(scope, construct_id, **kwargs)
+
+        # Lambda function (handles GET + POST for now)
         note_lambda = _lambda.Function(
-            self, "CreateNoteFunction",
+            self,
+            "NotesFunction",
             runtime=_lambda.Runtime.PYTHON_3_12,
             handler="handler.lambda_handler",
             code=_lambda.Code.from_asset("../lambda"),
-            environment={
-                "TABLE_NAME": notes_table.table_name
-            }
+            environment={"TABLE_NAME": notes_table.table_name},
         )
 
-        # Least-privilege: allow only PutItem
-        notes_table.grant_write_data(note_lambda)
+        # PR1: handler does PutItem (POST) and Query (GET) => needs read+write.
+        # PR4: we will split into 2 lambdas for true least privilege.
+        notes_table.grant_read_write_data(note_lambda)
 
-        # Use HttpJwtAuthorizer instead of HttpUserPoolAuthorizer
+        # JWT authorizer for HTTP API (Cognito User Pool)
         cognito_auth = authorizers.HttpJwtAuthorizer(
             "UserPoolAuthorizer",
             jwt_issuer=f"https://cognito-idp.{self.region}.amazonaws.com/{user_pool.user_pool_id}",
-            jwt_audience=[user_pool_client.user_pool_client_id]
+            jwt_audience=[user_pool_client.user_pool_client_id],
         )
 
-        # HTTP API Gateway
         api = apigw.HttpApi(
-            self, "NotesApi",
+            self,
+            "NotesApi",
             default_authorizer=cognito_auth,
-            default_integration=integrations.HttpLambdaIntegration(
-                "LambdaIntegration", note_lambda
-            )
         )
-        
+
+        api.add_routes(
+            path="/notes",
+            methods=[apigw.HttpMethod.POST],
+            integration=integrations.HttpLambdaIntegration(
+                "PostNotesIntegration",
+                note_lambda,
+            ),
+        )
+
+        api.add_routes(
+            path="/notes",
+            methods=[apigw.HttpMethod.GET],
+            integration=integrations.HttpLambdaIntegration(
+                "GetNotesIntegration",
+                note_lambda,
+            ),
+        )
+
         CfnOutput(self, "HttpApiUrl", value=api.api_endpoint)
