@@ -48,17 +48,17 @@ Security intent:
 
 ## Evidence index (this folder)
 - `02-unauthenticated-request.jpg` — Unauthenticated call denied (401/403)
-- `03-cognito-signup-usersub.jpg` — Cognito sign-up output showing user `sub`
+- `03-cognito-signup-usersub.jpg` — Cognito sign-up output showing user `sub` (immutable identity)
 - `04-token-issued.jpg` — JWT access token obtained
 - `05-post-note.jpg` — Authorized POST succeeds
-- `06-get-notes.jpg` — Authorized GET returns notes scoped to `sub`
+- `06-get-notes.jpg` — Authorized GET returns notes scoped to `sub` 
 - `07-spoof-attempt.jpg` — POST with spoofed `userId` attempt
 - `08-get-after-spoof.jpg` — GET proves stored `userId` still equals authenticated `sub`
 - `09-code-identity-binding.jpg` — Handler binds identity to JWT claims (`sub`)
 - `10-code-authorizer-and-routes.png` — CDK defines JWT authorizer + `/notes` routes + IAM grant
 
 ## Validation performed (evidence)
-1. Deployed stacks successfully 
+1. Confirmed API exists and routes/integrations are deployed (see `10-code-authorizer-and-routes.png` and `06-get-notes.jpg` for successful invocation). 
 2. Confirmed unauthenticated requests are denied (401/403) (see `02-unauthenticated-request.jpg`).
 3. Created/confirmed Cognito user and obtained JWT (see `03-cognito-signup-usersub.jpg`, `04-token-issued.jpg`).
 4. Verified authorized POST creates a note (see `05-post-note.jpg`).
@@ -67,7 +67,7 @@ Security intent:
    - Sent POST with `userId="someone-else"` in body (see `07-spoof-attempt.jpg`)
    - Confirmed stored/query `userId` remains authenticated principal (`sub`) (see `08-get-after-spoof.jpg`)
 7. Verified application enforces identity binding in handler code (see `09-code-identity-binding.jpg`).
-8. Verified IaC enforces authorizer + routes + required IAM grants (see `10-code-authorizer-and-routes.png`).
+8. Verified IaC enforces JWT authorizer + + explicit /notes routes + required IAM grants (see `10-code-authorizer-and-routes.png`).
 
 ## Next improvements (planned)
 - **PR2:** API access logging (structured), log retention, X-Ray tracing
