@@ -17,7 +17,7 @@ A secure, fully serverless Notes API built using AWS CDK (Python), Cognito, Lamb
 
 This project uses a zero-trust, serverless design with token-based authentication, scoped access control, and modular infrastructure-as-code deployment.
 
-![Architecture Diagram](screenshots/zero-trust-arch-diagram.png)
+![End-to-end Architecture](screenshots/serverless-architecture-diagram.png)
 
 ### Components
 
@@ -30,6 +30,15 @@ This project uses a zero-trust, serverless design with token-based authenticatio
 
 
 ## CDK Stack Structure
+
+The infrastructure is organized into three CDK stacks (`AuthStack`, `DataStack`, `ApiStack`) for modularity and separation of concerns—making changes safer, deployments cleaner, and security reviews easier.
+
+<details>
+  <summary><b>CDK Stack Decomposition (AuthStack / DataStack / ApiStack)</b></summary>
+
+  ![CDK Stack Decomposition](screenshots/cdk-stacks.png)
+</details>
+
 | Stack Name  | Purpose                                                          |
 | ----------- | ---------------------------------------------------------------- |
 | `AuthStack` | Creates **Cognito User Pool** and **App Client**                 |
@@ -45,6 +54,8 @@ This project uses a zero-trust, serverless design with token-based authenticatio
 ## 🔐 Security Design
 This project adopts a Zero-Trust security model with token-based access control, server-side authorization, and infrastructure as code.
 
+![Security Boundaries](screenshots/security-boundaries.png)
+
 
 Enforced server-side authorization by binding all DynamoDB reads/writes to the authenticated JWT principal (preferring immutable `sub`), preventing horizontal privilege escalation (BOLA/IDOR). Validated controls end-to-end with Cognito token issuance and negative testing (unauthenticated + spoof attempts).
 
@@ -53,8 +64,6 @@ Enforced server-side authorization by binding all DynamoDB reads/writes to the a
 - ✅ **Least Privilege IAM (Current State)** – Lambda has DynamoDB read/write permissions to support GET(Query) + POST(PutItem). *(Planned: split functions per route for strict least privilege.)*
 - ✅ **No Hardcoded Credentials** – Authentication uses Cognito; no secrets stored in repo.
 - ✅ **IaC + Repeatability** – Infrastructure is defined in CDK for consistent deployments and auditability.
-  
-
 - 📎 **Evidence:** [`evidence/pr1/`](evidence/pr1/) (deployment outputs, unauth denied, token issuance, spoof-prevention validation)
 
 <br><br>
