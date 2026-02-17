@@ -1,4 +1,8 @@
-# Evidence: AuthN/AuthZ Identity Binding + Correct IAM
+# PR1 Evidence: AuthN/AuthZ Identity Binding + Correct IAM
+
+## Control objective
+Ensure only authenticated principals can invoke the API (**AuthN**), and ensure data access is scoped to the authenticated principal’s identity (**AuthZ**) to prevent BOLA/IDOR.
+
 
 ## Summary
 This PR hardens the Notes API by enforcing **server-side identity binding** using validated JWT claims and correcting permissions to match runtime behavior. The key security fix prevents **horizontal privilege escalation** by ensuring clients cannot choose or spoof the `userId` used for DynamoDB reads/writes.
@@ -30,7 +34,7 @@ Security intent:
 - DynamoDB permissions were updated to match actual handler behavior:
   - GET uses `Query`
   - POST uses `PutItem`
-- Temporary broader access via `grant_read_write_data()` is acceptable for  correctness; functions will be split to enforce true least privilege per route.
+- Temporary broader access via `grant_read_write_data()` is acceptable for PR1 functional correctness; PR4 splits functions to enforce strict least privilege per route.
 
 ## Why this matters (risk reduction)
 - Prevents **horizontal privilege escalation** / **IDOR** where users can access or create resources belonging to other users.
@@ -41,15 +45,29 @@ Security intent:
 - **OWASP API Security Top 10:** API1:2019 / API1:2023 — **Broken Object Level Authorization (BOLA)**
 - General principle: **AuthN ≠ AuthZ** (being authenticated does not mean the request is authorized)
 
+
+## Evidence index (this folder)
+- `02-unauthenticated-request.jpg` — Unauthenticated call denied (401/403)
+- `03-cognito-signup-usersub.jpg` — Cognito sign-up output showing user `sub`
+- `04-token-issued.jpg` — JWT access token obtained
+- `05-post-note.jpg` — Authorized POST succeeds
+- `06-get-notes.jpg` — Authorized GET returns notes scoped to `sub`
+- `07-spoof-attempt.jpg` — POST with spoofed `userId` attempt
+- `08-get-after-spoof.jpg` — GET proves stored `userId` still equals authenticated `sub`
+- `09-code-identity-binding.jpg` — Handler binds identity to JWT claims (`sub`)
+- `10-code-authorizer-and-routes.png` — CDK defines JWT authorizer + `/notes` routes + IAM grant
+
 ## Validation performed (evidence)
-1. Deployed stacks successfully (CDK outputs captured).
-2. Confirmed unauthenticated requests are denied (401/403).
-3. Created/confirmed Cognito user and obtained JWT.
-4. Verified authorized POST creates a note.
-5. Verified authorized GET returns notes scoped to JWT identity (`sub`).
-6. Attempted spoofing:
-   - Sent POST with `userId="someone-else"` in body
-   - Confirmed stored/query `userId` remains the authenticated principal (`sub`), not the spoofed value.
+1. Deployed stacks successfully 
+2. Confirmed unauthenticated requests are denied (401/403) (see `02-unauthenticated-request.jpg`).
+3. Created/confirmed Cognito user and obtained JWT (see `03-cognito-signup-usersub.jpg`, `04-token-issued.jpg`).
+4. Verified authorized POST creates a note (see `05-post-note.jpg`).
+5. Verified authorized GET returns notes scoped to JWT identity (`sub`) (see `06-get-notes.jpg`).
+6. Attempted spoofing (BOLA/IDOR):
+   - Sent POST with `userId="someone-else"` in body (see `07-spoof-attempt.jpg`)
+   - Confirmed stored/query `userId` remains authenticated principal (`sub`) (see `08-get-after-spoof.jpg`)
+7. Verified application enforces identity binding in handler code (see `09-code-identity-binding.jpg`).
+8. Verified IaC enforces authorizer + routes + required IAM grants (see `10-code-authorizer-and-routes.png`).
 
 ## Next improvements (planned)
 - **PR2:** API access logging (structured), log retention, X-Ray tracing
