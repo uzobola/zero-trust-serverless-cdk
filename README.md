@@ -6,16 +6,16 @@ A secure, fully serverless Notes API built using AWS CDK (Python), Cognito, Lamb
 ## 📌 Project Features
 -  **Zero Trust Authentication** using Amazon Cognito and JWT validation
 -  **Serverless** architecture with AWS Lambda and API Gateway (HTTP API v2)
--  **Fine-Grained IAM**: Lambda has scoped access (PutItem only)
+-  **Scoped IAM** (PR1): Lambda has DynamoDB read/write to support GET(Query) + POST(PutItem); **PR4 splits functions for strict least privilege per route.**
 -  **DynamoDB**: Notes stored by composite key (`userId` + `noteId`)
--  **Modular CDK Stacks**: `AuthStack`, `DataStack`, and `ApiStack
+-  **Modular CDK Stacks**: `AuthStack`, `DataStack`, and `ApiStack`
 -  **Tested** via `curl`, PowerShell, and Postman (JWT Auth flows)
 
 ---
 
 ## 🏗️ Architecture Overview
 
-This project uses a zero-trust, serverless design with token-based authentication, least-privilege access control, and modular infrastructure-as-code deployment.
+This project uses a zero-trust, serverless design with token-based authentication, scoped access control, and modular infrastructure-as-code deployment.
 
 ![Architecture Diagram](screenshots/zero-trust-arch-diagram.png)
 
@@ -23,7 +23,7 @@ This project uses a zero-trust, serverless design with token-based authenticatio
 
 - **Amazon Cognito** – Authenticates users using secure tokens (JWT).
 - **Amazon API Gateway (HTTP API)** – Exposes secure endpoints, protected by Cognito JWT authorizer.
-- **AWS Lambda** – Handles note creation with least-privilege permissions.
+- **AWS Lambda** – Handles note create/read and enforces server-side identity binding using JWT claims (`sub`).
 - **Amazon DynamoDB** – Stores user notes with partition/sort keys.
 - **AWS CDK (Python)** – Defines and deploys infrastructure as code.
 
@@ -43,13 +43,19 @@ This project uses a zero-trust, serverless design with token-based authenticatio
 --- 
 
 ## 🔐 Security Design
-This project adopts a Zero-Trust security model with token-based access control, scoped permissions, and infrastructure as code.
+This project adopts a Zero-Trust security model with token-based access control, server-side authorization, and infrastructure as code.
 
-- ✅ **JWT-Based Stateless Authentication** – Cognito User Pools issue signed JWTs used to authenticate API requests.
-- ✅ **Least Privilege IAM Permissions** – Lambda function is granted only `PutItem` access to the DynamoDB table.
-- ✅ **No Hardcoded Credentials** – All authentication is handled securely via Cognito; no secrets in code.
-- ✅ **API Gateway Protected with JWT Authorizer** – Verifies the `Authorization` header on every request.
-- ✅ **Deployed with CDK Best Practices** – Secure-by-default infrastructure defined in code for repeatability and auditability.
+
+Enforced server-side authorization by binding all DynamoDB reads/writes to the authenticated JWT principal (preferring immutable `sub`), preventing horizontal privilege escalation (BOLA/IDOR). Validated controls end-to-end with Cognito token issuance and negative testing (unauthenticated + spoof attempts).
+
+- ✅ **JWT-Based Stateless Authentication (AuthN)** – API Gateway validates Cognito-issued JWTs on every request via HTTP API JWT authorizer.
+- ✅ **Server-Side Authorization (AuthZ) / Identity Binding** – Lambda derives identity from JWT claims (prefers immutable `sub`) and scopes all DynamoDB reads/writes to that principal, preventing BOLA/IDOR.
+- ✅ **Least Privilege IAM (Current State)** – Lambda has DynamoDB read/write permissions to support GET(Query) + POST(PutItem). *(Planned: split functions per route for strict least privilege.)*
+- ✅ **No Hardcoded Credentials** – Authentication uses Cognito; no secrets stored in repo.
+- ✅ **IaC + Repeatability** – Infrastructure is defined in CDK for consistent deployments and auditability.
+  
+
+- 📎 **Evidence:** [`evidence/pr1/`](evidence/pr1/) (deployment outputs, unauth denied, token issuance, spoof-prevention validation)
 
 <br><br>
 
@@ -111,9 +117,11 @@ Authorizer enforces strict token validation for all routes.
 
 <br><br>
 
-### Lambda Integration with $default Route
-The $default route connects directly to a Lambda function for note handling.
-![Lambda Integration](screenshots/lambda-integration.png)
+### Lambda Integration (Routes → Lambda)
+Routes (`GET /notes`, `POST /notes`) integrate with the Lambda handler.
+
+![API Routes](screenshots/api-routes-notes.png)
+![API Integrations](screenshots/api-integrations-lambda.png)
 
 <br><br>
 
@@ -121,9 +129,21 @@ The $default route connects directly to a Lambda function for note handling.
 POST request with a valid JWT confirms end-to-end authentication flow.
 ![JWT Auth POST](screenshots/successful-jwt-post.png)
 
+<br><br>
 
+### ❌ Unauthenticated Request Denied
+GET without a JWT is rejected by the authorizer (401/403).
+![Unauth GET Denied](screenshots/unauthenticated-get-denied.png)
 
 <br><br>
+
+### 🛡️ Spoof Attempt Prevented (BOLA/IDOR Mitigation)
+POST attempts to spoof `userId` are ignored; stored/query `userId` remains the authenticated JWT principal (`sub`).
+![Spoof Attempt](screenshots/spoof-attempt-post.jpg)
+![GET After Spoof](screenshots/get-after-spoof.jpg)
+
+<br><br>
+
 
 ## 📚 Deployment & Testing
 Please see the [Deployment Guide](./deployment-guide.md) for instructions on:
@@ -133,8 +153,17 @@ Please see the [Deployment Guide](./deployment-guide.md) for instructions on:
 - CLI & Postman JWT Testing
 - Cleanup with `cdk destroy`
 
+<br><br>
+
+
+## 🚧 Roadmap (Future Enhancements)
+- PR2: API access logging (structured), log retention, X-Ray tracing
+- PR3: DynamoDB PITR + CMK (KMS) + stage-safe removal policies
+- PR4: Split GET/POST into separate Lambdas for strict least privilege IAM per route
+- PR5: Threat model + controls matrix + evidence packaging
 
 <br><br>
+
 
 ## License
 ### Author
