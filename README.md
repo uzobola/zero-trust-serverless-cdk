@@ -36,7 +36,7 @@ The infrastructure is organized into three CDK stacks (`AuthStack`, `DataStack`,
 <details>
   <summary><b>CDK Stack Decomposition (AuthStack / DataStack / ApiStack)</b></summary>
 
-  ![CDK Stack Decomposition](screenshots/cdk-stacks.png)
+  ![CDK Stack Decomposition](screenshots/cdk-stack.png)
 </details>
 
 | Stack Name  | Purpose                                                          |

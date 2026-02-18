@@ -3,10 +3,12 @@
 import json
 import os
 import boto3
+from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ["TABLE_NAME"])
+
 
 def _resp(status: int, body):
     return {
@@ -14,6 +16,7 @@ def _resp(status: int, body):
         "headers": {"Content-Type": "application/json"},
         "body": json.dumps(body),
     }
+
 
 def lambda_handler(event, context):
     method = event.get("requestContext", {}).get("http", {}).get("method", "")
@@ -39,13 +42,38 @@ def lambda_handler(event, context):
         note_id = body.get("noteId")
         content = body.get("content")
 
-        if not note_id or not content:
+        # Presence checks
+        if note_id is None or content is None:
             return _resp(400, {"message": "Missing required fields: noteId, content"})
 
+        # Type checks
+        if not isinstance(note_id, str):
+            return _resp(400, {"message": "noteId must be a string"})
+        if not isinstance(content, str):
+            return _resp(400, {"message": "content must be a string"})
+
+        # Constraints
+        note_id = note_id.strip()
+        if not note_id:
+            return _resp(400, {"message": "noteId cannot be empty"})
+        if len(note_id) > 128:
+            return _resp(400, {"message": "noteId too long"})
+
+        if not content.strip():
+            return _resp(400, {"message": "content cannot be empty"})
         if len(content) > 4000:
             return _resp(400, {"message": "content too large"})
 
-        table.put_item(Item={"userId": user_id, "noteId": note_id, "content": content})
+        try:
+            table.put_item(
+                Item={"userId": user_id, "noteId": note_id, "content": content},
+                ConditionExpression="attribute_not_exists(userId) AND attribute_not_exists(noteId)",
+            )
+        except ClientError as e:
+            if e.response["Error"]["Code"] == "ConditionalCheckFailedException":
+                return _resp(409, {"message": "noteId already exists"})
+            raise
+
         return _resp(200, {"message": "Note created"})
 
     if method == "GET":
@@ -56,9 +84,7 @@ def lambda_handler(event, context):
 
 
 
-# OLD CODE
-
-
+# OLD Version ( for reference)
 # import json
 # import os
 # import boto3
