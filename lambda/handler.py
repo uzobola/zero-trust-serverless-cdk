@@ -77,11 +77,20 @@ def lambda_handler(event, context):
         return _resp(200, {"message": "Note created"})
 
     if method == "GET":
+        # Primary: query notes keyed by immutable principal (sub)
         resp = table.query(KeyConditionExpression=Key("userId").eq(user_id))
-        return _resp(200, {"items": resp.get("Items", [])})
+        items = resp.get("Items", [])
+
+        # Backward compat: older notes may have been keyed by email
+        if not items:
+            email = claims.get("email")
+            if email and email != user_id:
+                resp2 = table.query(KeyConditionExpression=Key("userId").eq(email))
+                items = resp2.get("Items", [])
+
+        return _resp(200, {"items": items})
 
     return _resp(405, {"message": "Method Not Allowed"})
-
 
 
 # OLD Version ( for reference)

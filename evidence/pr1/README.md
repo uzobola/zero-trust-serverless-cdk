@@ -56,6 +56,7 @@ Security intent:
 - `08-get-after-spoof.jpg` — GET proves stored `userId` still equals authenticated `sub`
 - `09-code-identity-binding.jpg` — Handler binds identity to JWT claims (`sub`)
 - `10-code-authorizer-and-routes.png` — CDK defines JWT authorizer + `/notes` routes + IAM grant
+- `11-conditional-write-409.png` — Duplicate noteId returns 409 (prevents overwrite/clobber)
 
 ## Validation performed (evidence)
 1. Confirmed API exists and routes/integrations are deployed (see `10-code-authorizer-and-routes.png` and `06-get-notes.jpg` for successful invocation). 
@@ -67,7 +68,8 @@ Security intent:
    - Sent POST with `userId="someone-else"` in body (see `07-spoof-attempt.jpg`)
    - Confirmed stored/query `userId` remains authenticated principal (`sub`) (see `08-get-after-spoof.jpg`)
 7. Verified application enforces identity binding in handler code (see `09-code-identity-binding.jpg`).
-8. Verified IaC enforces JWT authorizer + + explicit /notes routes + required IAM grants (see `10-code-authorizer-and-routes.png`).
+8. Verified IaC enforces JWT authorizer + explicit `/notes` routes + required IAM grants (see `10-code-authorizer-and-routes.png`).
+9.  Verified duplicate noteId is rejected with 409 using DynamoDB conditional write (see `11-conditional-write-409.png`).
 
 ## Next improvements (planned)
 - **PR2:** API access logging (structured), log retention, X-Ray tracing

@@ -64,6 +64,7 @@ Enforced server-side authorization by binding all DynamoDB reads/writes to the a
 - ✅ **Least Privilege IAM (Current State)** – Lambda has DynamoDB read/write permissions to support GET(Query) + POST(PutItem). *(Planned: split functions per route for strict least privilege.)*
 - ✅ **No Hardcoded Credentials** – Authentication uses Cognito; no secrets stored in repo.
 - ✅ **IaC + Repeatability** – Infrastructure is defined in CDK for consistent deployments and auditability.
+- ✅ **CORS enforced at API Gateway** (preflight handled at edge; explicit allowed origins + headers).
 - 📎 **Evidence:** [`evidence/pr1/`](evidence/pr1/) (deployment outputs, unauth denied, token issuance, spoof-prevention validation)
 
 <br><br>
