@@ -73,7 +73,7 @@ class ApiStack(Stack):
             integration=integrations.HttpLambdaIntegration("GetNotesIntegration", note_lambda),
         )
 
-        # Access logs (audit-grade)
+        # Access logs (audit and debugging)
         api_access_logs = logs.LogGroup(
             self,
             "HttpApiAccessLogs",
@@ -93,8 +93,7 @@ class ApiStack(Stack):
             '"responseLength":"$context.responseLength",'
             '"integrationError":"$context.integrationErrorMessage",'
             '"userAgent":"$context.identity.userAgent",'
-            '"authorizerSub":"$context.authorizer.jwt.claims.sub",'
-            '"authorizerSubAlt":"$context.authorizer.claims.sub"'
+            '"principalSub":"$context.authorizer.claims.sub"'
             "}"
         )
 

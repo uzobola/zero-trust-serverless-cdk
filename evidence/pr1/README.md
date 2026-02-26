@@ -57,6 +57,8 @@ Security intent:
 - `09-code-identity-binding.jpg` — Handler binds identity to JWT claims (`sub`)
 - `10-code-authorizer-and-routes.png` — CDK defines JWT authorizer + `/notes` routes + IAM grant
 - `11-conditional-write-409.png` — Duplicate noteId returns 409 (prevents overwrite/clobber)
+- `12-cors-preflight-204.png` — CORS preflight (OPTIONS) allowed with explicit origin + auth headers
+- `13-cdk-diff-corsconfiguration.png` — IaC proof: AWS::ApiGatewayV2::Api includes CorsConfiguration
 
 ## Validation performed (evidence)
 1. Confirmed API exists and routes/integrations are deployed (see `10-code-authorizer-and-routes.png` and `06-get-notes.jpg` for successful invocation). 
@@ -69,7 +71,8 @@ Security intent:
    - Confirmed stored/query `userId` remains authenticated principal (`sub`) (see `08-get-after-spoof.jpg`)
 7. Verified application enforces identity binding in handler code (see `09-code-identity-binding.jpg`).
 8. Verified IaC enforces JWT authorizer + explicit `/notes` routes + required IAM grants (see `10-code-authorizer-and-routes.png`).
-9.  Verified duplicate noteId is rejected with 409 using DynamoDB conditional write (see `11-conditional-write-409.png`).
+9. Verified duplicate noteId is rejected with 409 using DynamoDB conditional write (see `11-conditional-write-409.png`).
+10. Verified API Gateway CORS configured at edge via CDK and validated via OPTIONS preflight.” (see `12-cors-preflight-204.png` and `13-cdk-diff-corsconfiguration.png`)
 
 ## Next improvements (planned)
 - **PR2:** API access logging (structured), log retention, X-Ray tracing
