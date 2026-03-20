@@ -124,13 +124,54 @@ class ApiStack(Stack):
             )
         )
 
-        # KMS grants — required because DynamoDB table uses CUSTOMER_MANAGED CMK (PR3)
-        # GET reads encrypted items -> needs decrypt
-        table_key.grant_decrypt(get_notes_lambda)
-
-        # POST writes encrypted items 
-        table_key.grant_encrypt_decrypt(post_notes_lambda)
         
+        ##################################################################################
+        # PR4 Change 4: KMS grants constrained to DynamoDB service only
+        # These conditions ensure Lambda cannot call KMS directly — only through DynamoDB.
+        #
+        # kms:ViaService     → KMS calls must originate from DynamoDB, not Lambda directly
+        # kms:CallerAccount  → Locks key usage to this AWS account only
+        # kms:EncryptionContext → Scopes to this specific table, not any DynamoDB table
+        #
+        # GET  → kms:Decrypt only (read encrypted items)
+        # POST → kms:GenerateDataKey + kms:Decrypt (write + DynamoDB internal flows)
+        ##################################################################################
+        via_service = f"dynamodb.{self.region}.amazonaws.com"
+
+        # GET needs decrypt (reads)
+        get_notes_lambda.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["kms:Decrypt", "kms:DescribeKey"],
+                resources=[table_key.key_arn],
+                conditions={
+                    "StringEquals": {
+                        "kms:ViaService": via_service,
+                        "kms:CallerAccount": self.account,
+                        "kms:EncryptionContext:aws:dynamodb:tableName": notes_table.table_name,
+                    }
+                },
+            )
+        )
+
+        # POST needs GenerateDataKey + Encrypt + Decrypt (write path)
+        post_notes_lambda.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=[
+                    "kms:Encrypt",
+                    "kms:Decrypt",
+                    "kms:DescribeKey",
+                    "kms:GenerateDataKey*",
+                ],
+                resources=[table_key.key_arn],
+                conditions={
+                    "StringEquals": {
+                        "kms:ViaService": via_service,
+                        "kms:CallerAccount": self.account,
+                        "kms:EncryptionContext:aws:dynamodb:tableName": notes_table.table_name,
+                    }
+                },
+            )
+        )
         ##################################################################################
         # Routes: each HTTP method wired to its dedicated Lambda
         # GET  /notes → GetNotesFunction  (Query + DescribeTable only)
@@ -173,8 +214,7 @@ class ApiStack(Stack):
             '"responseLength":"$context.responseLength",'
             '"integrationError":"$context.integrationErrorMessage",'
             '"userAgent":"$context.identity.userAgent",'
-            '"principalSub":"$context.authorizer.claims.sub",'
-            '"principalSub_jwtPath":"$context.authorizer.jwt.claims.sub"'
+            '"principalSub":"$context.authorizer.claims.sub"'
             "}"
         )
 

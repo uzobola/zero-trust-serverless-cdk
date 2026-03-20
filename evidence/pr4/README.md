@@ -76,3 +76,17 @@ Because the table uses `CUSTOMER_MANAGED` encryption, the Lambda roles also need
 - This PR intentionally prefers explicit action-level IAM over CDK convenience grants to prevent over-permissioning.
 - Because the DynamoDB table is encrypted with a CMK (PR3), each Lambda role must be granted the minimum KMS permissions required for its operation.
 - In enterprise environments, key policy and grants should be tightly controlled — separation of duties between key admins and app roles.
+
+---
+
+## Post-review update: KMS grants constrained to DynamoDB service only
+
+After PR review, KMS grants were tightened with IAM condition keys to prevent 
+Lambda from calling KMS directly outside of DynamoDB:
+
+- `kms:ViaService` — KMS calls must originate from DynamoDB, not Lambda directly
+- `kms:CallerAccount` — Locks key usage to this AWS account only
+- `kms:EncryptionContext:aws:dynamodb:tableName` — Scopes to this specific table only
+
+This ensures the KMS grants are only usable through the DynamoDB service path — 
+consistent with the least-privilege principle applied throughout this PR.
