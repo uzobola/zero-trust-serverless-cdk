@@ -17,7 +17,8 @@ from zero_trust_serverless.api_stack import ApiStack
 api_stack = ApiStack(app, "ApiStack",
     user_pool=auth_stack.user_pool,
     user_pool_client=auth_stack.user_pool_client,
-    notes_table=data_stack.table
+    notes_table=data_stack.table,
+    table_key=data_stack.table_key,
 )
 
 

@@ -1,4 +1,3 @@
-
 from aws_cdk import (
     Stack,
     CfnOutput,
@@ -9,6 +8,7 @@ from aws_cdk import (
     aws_apigatewayv2_integrations as integrations,
     aws_apigatewayv2_authorizers as authorizers,
     aws_logs as logs,
+    aws_iam as iam,
 )
 from aws_cdk.aws_apigatewayv2 import CorsHttpMethod
 from constructs import Construct
@@ -23,23 +23,17 @@ class ApiStack(Stack):
         user_pool,
         user_pool_client,
         notes_table,
+        table_key,
         **kwargs,
     ):
         super().__init__(scope, construct_id, **kwargs)
 
-        note_lambda = _lambda.Function(
-            self,
-            "NotesFunction",
-            runtime=_lambda.Runtime.PYTHON_3_12,
-            handler="handler.lambda_handler",
-            code=_lambda.Code.from_asset("../lambda"),
-            environment={"TABLE_NAME": notes_table.table_name},
-            tracing=_lambda.Tracing.ACTIVE,
-            log_retention=logs.RetentionDays.ONE_MONTH,
-        )
-
-        notes_table.grant_read_write_data(note_lambda)
-
+        ##################################################################################
+        # Cognito JWT Authorizer
+        # Every route in this API requires a valid JWT issued by our Cognito User Pool.
+        # API Gateway validates the token at the edge — before Lambda ever runs.
+        # This is the Zero Trust principle: never trust, always verify.
+        ##################################################################################
         cognito_auth = authorizers.HttpJwtAuthorizer(
             "UserPoolAuthorizer",
             jwt_issuer=f"https://cognito-idp.{self.region}.amazonaws.com/{user_pool.user_pool_id}",
@@ -48,6 +42,11 @@ class ApiStack(Stack):
 
         allowed_origins = self.node.try_get_context("allowed_origins") or ["http://localhost:3000"]
 
+        ##################################################################################
+        # HTTP API with default JWT authorizer
+        # default_authorizer applies Cognito JWT validation to ALL routes automatically.
+        # No route can be called without a valid token — no per-route opt-in required.
+        ##################################################################################
         http_api = apigw.HttpApi(
             self,
             "NotesApi",
@@ -60,25 +59,147 @@ class ApiStack(Stack):
             ),
         )
 
-        # Routes first (helps ensure default stage exists in all CDK versions)
-        http_api.add_routes(
-            path="/notes",
-            methods=[apigw.HttpMethod.POST],
-            integration=integrations.HttpLambdaIntegration("PostNotesIntegration", note_lambda),
+        ##################################################################################
+        # PR4 Change 1: Dedicated GET Lambda — scoped to read-only execution role
+        # Previously one Lambda handled both GET and POST under a single IAM role
+        # with read+write access. Now GET has its own function and its own role.
+        # Permissions are granted explicitly below — not via CDK managed grants.
+        ##################################################################################
+        get_notes_lambda = _lambda.Function(
+            self,
+            "GetNotesFunction",
+            runtime=_lambda.Runtime.PYTHON_3_12,
+            handler="handler.get_notes_handler",  # Dedicated GET handler
+            code=_lambda.Code.from_asset("../lambda"),
+            environment={"TABLE_NAME": notes_table.table_name},
+            tracing=_lambda.Tracing.ACTIVE,
+            log_retention=logs.RetentionDays.ONE_MONTH,
         )
 
+        ##################################################################################
+        # PR4 Change 2: Dedicated POST Lambda — scoped to write-only execution role
+        # POST has its own function and its own role.
+        # Permissions are granted explicitly below — not via CDK managed grants.
+        ##################################################################################
+        post_notes_lambda = _lambda.Function(
+            self,
+            "PostNotesFunction",
+            runtime=_lambda.Runtime.PYTHON_3_12,
+            handler="handler.post_notes_handler",  # Dedicated POST handler
+            code=_lambda.Code.from_asset("../lambda"),
+            environment={"TABLE_NAME": notes_table.table_name},
+            tracing=_lambda.Tracing.ACTIVE,
+            log_retention=logs.RetentionDays.ONE_MONTH,
+        )
+
+        ##################################################################################
+        # PR4 Change 3: Action-level least privilege — explicit over convenient
+        #
+        # CDK's grant_read_data() grants 6 actions (Query, Scan, GetItem, BatchGetItem,
+        # ConditionCheckItem, DescribeTable) even when the Lambda only needs 1 or 2.
+        # grant_write_data() includes UpdateItem and DeleteItem — neither of which
+        # this API needs.
+        #
+        # Instead we use add_to_role_policy() to grant only what each Lambda
+        # actually calls:
+        #   GET Lambda  → dynamodb:Query (userId lookup) + DescribeTable
+        #   POST Lambda → dynamodb:PutItem (conditional write) + DescribeTable
+        #
+        # This is operation-level scoping, not just table-level scoping.
+        # If GET Lambda is compromised, it cannot write data.
+        # If POST Lambda is compromised, it cannot read other users' notes.
+        # Blast radius is contained at the IAM policy level.
+        ##################################################################################
+        get_notes_lambda.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["dynamodb:Query", "dynamodb:DescribeTable"],
+                resources=[notes_table.table_arn],
+            )
+        )
+
+        post_notes_lambda.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["dynamodb:PutItem", "dynamodb:DescribeTable"],
+                resources=[notes_table.table_arn],
+            )
+        )
+
+        
+        ##################################################################################
+        # PR4 Change 4: KMS grants constrained to DynamoDB service only
+        # These conditions ensure Lambda cannot call KMS directly — only through DynamoDB.
+        #
+        # kms:ViaService     → KMS calls must originate from DynamoDB, not Lambda directly
+        # kms:CallerAccount  → Locks key usage to this AWS account only
+        # kms:EncryptionContext → Scopes to this specific table, not any DynamoDB table
+        #
+        # GET  → kms:Decrypt only (read encrypted items)
+        # POST → kms:GenerateDataKey + kms:Decrypt (write + DynamoDB internal flows)
+        ##################################################################################
+        via_service = f"dynamodb.{self.region}.amazonaws.com"
+
+        # GET needs decrypt (reads)
+        get_notes_lambda.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["kms:Decrypt", "kms:DescribeKey"],
+                resources=[table_key.key_arn],
+                conditions={
+                    "StringEquals": {
+                        "kms:ViaService": via_service,
+                        "kms:CallerAccount": self.account,
+                        "kms:EncryptionContext:aws:dynamodb:tableName": notes_table.table_name,
+                    }
+                },
+            )
+        )
+
+        # POST needs GenerateDataKey + Encrypt + Decrypt (write path)
+        post_notes_lambda.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=[
+                    "kms:Encrypt",
+                    "kms:Decrypt",
+                    "kms:DescribeKey",
+                    "kms:GenerateDataKey*",
+                ],
+                resources=[table_key.key_arn],
+                conditions={
+                    "StringEquals": {
+                        "kms:ViaService": via_service,
+                        "kms:CallerAccount": self.account,
+                        "kms:EncryptionContext:aws:dynamodb:tableName": notes_table.table_name,
+                    }
+                },
+            )
+        )
+        ##################################################################################
+        # Routes: each HTTP method wired to its dedicated Lambda
+        # GET  /notes → GetNotesFunction  (Query + DescribeTable only)
+        # POST /notes → PostNotesFunction (PutItem + DescribeTable only)
+        ##################################################################################
         http_api.add_routes(
             path="/notes",
             methods=[apigw.HttpMethod.GET],
-            integration=integrations.HttpLambdaIntegration("GetNotesIntegration", note_lambda),
+            integration=integrations.HttpLambdaIntegration("GetNotesIntegration", get_notes_lambda),
         )
 
-        # Access logs (audit and debugging)
+        http_api.add_routes(
+            path="/notes",
+            methods=[apigw.HttpMethod.POST],
+            integration=integrations.HttpLambdaIntegration("PostNotesIntegration", post_notes_lambda),
+        )
+
+        ##################################################################################
+        # Access logs — structured JSON for every API request
+        # Captures requestId (correlation), principalSub (identity), status, and route.
+        # This is the audit trail that ties every action back to an authenticated identity.
+        # dev: DESTROY for easy teardown. prod: change to RETAIN.
+        ##################################################################################
         api_access_logs = logs.LogGroup(
             self,
             "HttpApiAccessLogs",
             retention=logs.RetentionDays.ONE_MONTH,
-            removal_policy=RemovalPolicy.DESTROY,  # dev-friendly; prod would be RETAIN
+            removal_policy=RemovalPolicy.DESTROY,
         )
 
         access_log_format = (
@@ -97,7 +218,7 @@ class ApiStack(Stack):
             "}"
         )
 
-        default_stage = http_api.default_stage.node.default_child  # CfnStage
+        default_stage = http_api.default_stage.node.default_child
         default_stage.access_log_settings = apigw.CfnStage.AccessLogSettingsProperty(
             destination_arn=api_access_logs.log_group_arn,
             format=access_log_format,
