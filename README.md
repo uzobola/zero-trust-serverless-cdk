@@ -207,7 +207,7 @@ Please see the [Deployment Guide](./deployment-guide.md) for instructions on:
 <br><br>
 
 
-## ## Security Enhancement Roadmap
+## Security Enhancement Roadmap
 
 - Add automated security tests for JWT authorization, BOLA/IDOR prevention, and route-level IAM behavior
 - Add CI workflow for CDK synthesis, unit tests, and security checks
